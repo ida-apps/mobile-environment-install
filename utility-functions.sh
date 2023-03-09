@@ -1,4 +1,22 @@
-#!/bin/bash
+#!/bin/sh
+
+# String formatting
+
+if [[ -t 1 ]]
+then
+  tty_escape() { printf "\033[%sm" "$1"; }
+else
+  tty_escape() { :; }
+fi
+
+tty_mkbold() { tty_escape "1;$1"; }
+tty_underline="$(tty_escape "4;39")"
+tty_blue="$(tty_mkbold 34)"
+tty_red="$(tty_mkbold 31)"
+tty_bold="$(tty_mkbold 39)"
+tty_reset="$(tty_escape 0)"
+
+# User input
 
 getc() {
   local save_state
@@ -28,14 +46,11 @@ abort() {
   exit 1
 }
 
+# Output
+
 error() {
   printf $(tput setaf 1)"%s\n" "Error: $1" "${@:2}" $(tput sgr0) >&2
   abort
-}
-
-exists()
-{
-  command -v "$1" >/dev/null 2>&1
 }
 
 message() {

@@ -10,27 +10,34 @@ install_home_brew() {
   if command -v brew >/dev/null 2>&1; then
     message "HomeBrew is already installed."
     printf "%s$(brew -v)\n"
-    abort
+
+    read -r -p "Do you want to update HomeBrew? Type ${tty_bold}y${tty_reset} to update. Type ${tty_bold}n${tty_reset} to skip. [y/N] " response
+    if [[ "$response" =~ ^[yY]$ ]]
+    then
+      message "Updating HomeBrew"
+      brew update
+      wait_for_user
+    else
+      return
+      wait_for_user
+    fi
   else
-    message "a"
-    abort
+    message "Installing HomeBrew"
+
+    HOME_BREW_EVAL="$(/opt/homebrew/bin/brew shellenv)"
+
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    # exporting homebrew env variable
+    echo "eval $HOME_BREW_EVAL" >>~/.zprofile
+    eval HOME_BREW_EVAL
+
+    message "HomeBrew Installed"
+    wait_for_user
   fi
-
-  message "Installing HomeBrew:"
-
-  HOME_BREW_EVAL="$(/opt/homebrew/bin/brew shellenv)"
-
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  # exporting homebrew env variable
-  echo "eval $HOME_BREW_EVAL" >>~/.zprofile
-  eval HOME_BREW_EVAL
-
-  message "\nHomeBrew Installed"
-  wait_for_user
 }
 
 install_android_cmd_tools() {
-  message "\nInstalling Android SDK:"
+  message "Installing Android SDK:"
 
   ANDROID_LOCATION=/opt/homebrew/share/android-commandlinetools
 
@@ -58,27 +65,27 @@ install_xcode_cmd_tools() {
 }
 
 install_ruby() {
-  message "\nInstalling Ruby:"
+  message "Installing Ruby:"
 
   arch -arm64 brew install rbenv ruby-build
   eval "$(rbenv init - zsh)"
 
-  message "\nRuby Installed"
+  message "Ruby Installed"
   wait_for_user
 }
 
 install_bundler() {
-  message "\nInstalling Bundler:"
+  message "Installing Bundler:"
 
   sudo gem install bundler
   rbenv rehash
 
-  message "\nBundler Installed"
+  message "Bundler Installed"
   wait_for_user
 }
 
 install_java() {
-  message "\nInstalling Java"
+  message "Checking Java Installation"
 
   brew install openjdk
   sudo ln -sfn /opt/homebrew/opt/openjdk/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk.jdk
