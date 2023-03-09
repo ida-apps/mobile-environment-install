@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Bash script for installing/updating a build environment
 
 source utility-functions.sh
