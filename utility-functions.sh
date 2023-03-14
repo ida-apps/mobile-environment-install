@@ -1,9 +1,37 @@
-#!/bin/sh
+#!/bin/bash
+
+source packages.sh
+
+# Output
+
+error() {
+  printf $(tput setaf 1)"%s\n" "Error: $1" "${@:2}" $(tput sgr0) >&2
+  abort
+}
+
+message() {
+  printf $(tput setaf 2)"%s\n" "$@" $(tput sgr0) >&2
+}
+
+info() {
+  printf $(tput setaf 3)"%s\n" "[INFO]" "$@" $(tput sgr0) >&2
+}
+
+export_env_variable() {
+  expression=$1
+
+  if "$SHELL" == "/bin/zsh"; then
+    echo "$expression" >>~/.zshrc
+    source ~/.zshrc
+  elif "$SHELL" == "/bin/bash"; then
+    echo "$expression" >>~/.bash_profile
+    source ~/.bash_profile
+  fi
+}
 
 # String formatting
 
-if [[ -t 1 ]]
-then
+if [[ -t 1 ]]; then
   tty_escape() { printf "\033[%sm" "$1"; }
 else
   tty_escape() { :; }
@@ -26,18 +54,6 @@ getc() {
   /bin/stty "${save_state}"
 }
 
-wait_for_user() {
-  local c
-  echo
-  echo "Press ${tty_bold}RETURN${tty_reset}/${tty_bold}ENTER${tty_reset} to continue or any other key to abort:"
-  getc c
-  # we test for \r and \n because some stuff does \r instead
-  if ! [[ "${c}" == $'\r' || "${c}" == $'\n' ]]
-  then
-    exit 1
-  fi
-}
-
 abort() {
   local c
   echo
@@ -46,13 +62,25 @@ abort() {
   exit 1
 }
 
-# Output
-
-error() {
-  printf $(tput setaf 1)"%s\n" "Error: $1" "${@:2}" $(tput sgr0) >&2
-  abort
+wait_for_user() {
+  if [ $SILENT == 0 ]; then
+    local c
+    echo
+    echo "Press ${tty_bold}RETURN${tty_reset}/${tty_bold}ENTER${tty_reset} to continue or any other key to abort..."
+    getc c
+    # we test for \r and \n because some stuff does \r instead
+    if ! [[ "${c}" == $'\r' || "${c}" == $'\n' ]]; then
+      exit 1
+    fi
+  fi
 }
 
-message() {
-  printf $(tput setaf 2)"%s\n" "$@" $(tput sgr0) >&2
+ask_user_yn() {
+  message=$1
+  command=$2
+
+  read -r -p $message response
+  if [[ "$response" =~ ^[yY]$ ]]; then
+    eval "$command"
+  fi
 }
