@@ -23,7 +23,7 @@ ANDROID_SDK_BUILD_TOOLS_VERSION="33.0.1" # Possible values: https://developer.an
 REQUIRE_XCODE_VERSION="any"   # Will abort execution if required XCode version was not installed manually. Value "any" skips the check.
 REQUIRE_ASTUDIO_VERSION="any" # Will show warning if required Android Studio build is not detected in the Applications folder. Value "any" skips the check.
 
-CLEAN_INSTALL=1 # Removes the environment prior to the installation.
+CLEAN_INSTALL=0 # Removes the environment prior to the installation.
 
 SHELL_PROFILE_PATH="" # Path to the shell's profile file.
 
