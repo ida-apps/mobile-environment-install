@@ -341,12 +341,14 @@ install_ruby() {
 
     echo "Installing Ruby $version"
 
+    export warnflags=-Wno-error=implicit-function-declaration
+
     if [ "$ruby_version" == "latest" ]; then
-      rvm install --latest
-      rvm use --latest
+      rvm reinstall --latest
+      rvm use --latest --default
     else
-      rvm install $version
-      rvm use $version
+      rvm reinstall "$version" --disable-dtrace
+      rvm use "$version --default"
     fi
 
     message "Ruby version $(ruby --version) is installed now."
