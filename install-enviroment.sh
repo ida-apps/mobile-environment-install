@@ -392,7 +392,7 @@ install_bundler() {
       gem uninstall bundler
     fi
 
-    if [ "$BUNDLER_TARGET_VERSION" == "latest" ]; then
+    if [ "$version" == "latest" ]; then
       gem install bundler
     else
       gem install bundler --version "$version"
