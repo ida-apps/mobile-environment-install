@@ -348,9 +348,9 @@ install_ruby() {
 
     export warnflags=-Wno-error=implicit-function-declaration
 
-    if [ "$ruby_version" == "latest" ]; then
-      rvm reinstall --latest
-      rvm use --latest --default
+    if [ "$version" = "latest" ]; then
+      eval "rvm install ruby --latest"
+      eval "rvm use ruby --latest --default"
     else
       rvm reinstall "$version" --disable-dtrace
       rvm use "$version --default"
