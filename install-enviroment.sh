@@ -16,6 +16,7 @@ eval home_dir=$home_dir
 
 JAVA_VERSION="latest"                    # Possible values: 8, 11, 17, latest
 RUBY_VERSION="latest"                    # Possible values: release number, latest
+NODE_VERSION="latest"                    # Possible values: 10, 12, 14, 16, 18, latest
 BUNDLER_VERSION="latest"                 # Possible values: release number, latest
 ANDROID_SDK_PLATFORMS_VERSION="33"       # Possible values: https://developer.android.com/studio/releases/platforms
 ANDROID_SDK_BUILD_TOOLS_VERSION="33.0.1" # Possible values: https://developer.android.com/studio/releases/build-tools
@@ -48,6 +49,10 @@ while [ "$#" -gt 0 ]; do
     ;;
   --version-ruby)
     RUBY_VERSION="$2"
+    shift 2
+    ;;
+  --version-node)
+    NODE_VERSION="$2"
     shift 2
     ;;
   --version-bundler)
@@ -466,6 +471,7 @@ install_java() {
 }
 
 install_yarn() {
+  local node_version=$1
   print_header "YARN"
 
   if ! [ -x "$(command -v yarn)" ]; then
@@ -482,7 +488,12 @@ install_yarn() {
   fi
 
   if [[ $NONINTERACTIVE == 1 ]] || [[ "$response" =~ ^[yY]$ ]]; then
-    brew reinstall node
+    if [ "$node_version" == "latest" ]; then
+      brew reinstall node
+    else
+      brew reinstall "node@$node_version"
+    fi
+
     brew reinstall yarn
   else
     return
@@ -580,7 +591,7 @@ install_environment() {
     install_android_cmd_tools "$ANDROID_SDK_BUILD_TOOLS_VERSION" "$ANDROID_SDK_PLATFORMS_VERSION" "$REQUIRE_ASTUDIO_VERSION"
     install_ruby "$RUBY_VERSION"
     install_bundler "$BUNDLER_VERSION"
-    install_yarn
+    install_yarn "$NODE_VERSION"
   else
     error "Git is required in order to proceed. Please install it manually."
   fi
