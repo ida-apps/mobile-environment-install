@@ -1,9 +1,3 @@
-<style>
-r { color: Red }
-o { color: Orange }
-g { color: Green }
-</style>
-
 # Environment Configurator
 
 ***
@@ -20,7 +14,7 @@ It's a fairly simple and straightforward script purposed for configuring(install
 * Node
 * Yarn
 
-<g>*If you find any bug or have improvement ideas but can't contribute, feel free to add to the TODO section at the bottom of this README ;)*</r>
+*If you find any bug or have improvement ideas but can't contribute, feel free to add to the TODO section at the bottom of this README ;)*
 
 
 ***
@@ -32,7 +26,7 @@ Simply call:
 /bin/bash install-enviroment.sh
 ```
 
-<o>**Important!**</o> Always execute the script under `bash`. It doesn't work well with `zsh`.
+**Important!** Always execute the script under `bash`. It doesn't work well with `zsh`.
 
 ### Arguments
 
@@ -46,7 +40,7 @@ All arguments are optional to use. If you don't include one the corresponding de
 ### `--clean <flag>`
 **Values**: `0` - *default*, `1`
 
-**Description**: In clean mode the environment gets removed before reinstalling it. <o>**Keep in mind that expressions and `PATH` variables exported to your shell profile will not be removed. You must reset them manually.**</o>
+**Description**: In clean mode the environment gets removed before reinstalling it. **Keep in mind that expressions and `PATH` variables exported to your shell profile will not be removed. You must reset them manually.**
 
 
 ### `--version-java <version>`
@@ -82,13 +76,13 @@ All arguments are optional to use. If you don't include one the corresponding de
 ### `--require-version-astudio <version>`
 **Values**: `<build_name>`(e.g. `AI-221.6008.13.2211.9619390`), `any` - *default*
 
-**Description**: Sets the desired target build version of Android Studio. <o>**This requirement is not strict and will not fail the execution but just display an error message.**</o>
+**Description**: Sets the desired target build version of Android Studio. **This requirement is not strict and will not fail the execution but just display an error message.**
 
 ***
 
 # TODO
 
--[x] ~~Write README.~~
--[ ] Add possibility to install multiple Android SDK versions at once.
+- [x] ~~Write README.~~
+- [ ] Add possibility to install multiple Android SDK versions at once.
 
 ***
