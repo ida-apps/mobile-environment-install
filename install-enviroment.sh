@@ -502,6 +502,32 @@ install_yarn() {
   wait_for_user
 }
 
+install_cocoapods() {
+  print_header "COCOAPODS"
+
+  if ! [ -x "$(command -v pod)" ]; then
+    local action="install"
+  else
+    local action="reinstall"
+
+    info "Current Pods installation:"
+    printf "%s$(pod --version)\n\n"
+  fi
+
+  if [ $NONINTERACTIVE == 0 ]; then
+    read -r -p "Do you want to $action CocoaPods? ${tty_bold}[y/N]${tty_reset} " response
+  fi
+
+  if [[ $NONINTERACTIVE == 1 ]] || [[ "$response" =~ ^[yY]$ ]]; then
+    brew reinstall cocoapods
+    brew link cocoapods
+  else
+    return
+  fi
+
+  wait_for_user
+}
+
 check_and_install_xcode() {
   local require_version=$1
   print_header "XCODE"
@@ -590,6 +616,7 @@ install_environment() {
     install_java "$JAVA_VERSION"
     install_android_cmd_tools "$ANDROID_SDK_BUILD_TOOLS_VERSION" "$ANDROID_SDK_PLATFORMS_VERSION" "$REQUIRE_ASTUDIO_VERSION"
     install_ruby "$RUBY_VERSION"
+    install_cocoapods
     install_bundler "$BUNDLER_VERSION"
     install_yarn "$NODE_VERSION"
   else
