@@ -16,6 +16,7 @@ eval home_dir=$home_dir
 
 JAVA_VERSION="latest"                    # Possible values: 8, 11, 17, latest
 RUBY_VERSION="latest"                    # Possible values: release number, latest
+NODE_VERSION="latest"                    # Possible values: 10, 12, 14, 16, 18, latest
 BUNDLER_VERSION="latest"                 # Possible values: release number, latest
 ANDROID_SDK_PLATFORMS_VERSION="33"       # Possible values: https://developer.android.com/studio/releases/platforms
 ANDROID_SDK_BUILD_TOOLS_VERSION="33.0.1" # Possible values: https://developer.android.com/studio/releases/build-tools
@@ -48,6 +49,10 @@ while [ "$#" -gt 0 ]; do
     ;;
   --version-ruby)
     RUBY_VERSION="$2"
+    shift 2
+    ;;
+  --version-node)
+    NODE_VERSION="$2"
     shift 2
     ;;
   --version-bundler)
@@ -341,12 +346,14 @@ install_ruby() {
 
     echo "Installing Ruby $version"
 
-    if [ "$ruby_version" == "latest" ]; then
-      rvm install --latest
-      rvm use --latest
+    export warnflags=-Wno-error=implicit-function-declaration
+
+    if [ "$version" = "latest" ]; then
+      eval "rvm install ruby --latest"
+      eval "rvm use ruby --latest --default"
     else
-      rvm install $version
-      rvm use $version
+      rvm reinstall "$version" --disable-dtrace
+      rvm use "$version --default"
     fi
 
     message "Ruby version $(ruby --version) is installed now."
@@ -385,7 +392,7 @@ install_bundler() {
       gem uninstall bundler
     fi
 
-    if [ "$BUNDLER_TARGET_VERSION" == "latest" ]; then
+    if [ "$version" == "latest" ]; then
       gem install bundler
     else
       gem install bundler --version "$version"
@@ -464,6 +471,7 @@ install_java() {
 }
 
 install_yarn() {
+  local node_version=$1
   print_header "YARN"
 
   if ! [ -x "$(command -v yarn)" ]; then
@@ -480,8 +488,39 @@ install_yarn() {
   fi
 
   if [[ $NONINTERACTIVE == 1 ]] || [[ "$response" =~ ^[yY]$ ]]; then
-    brew reinstall node
+    if [ "$node_version" == "latest" ]; then
+      brew reinstall node
+    else
+      brew reinstall "node@$node_version"
+    fi
+
     brew reinstall yarn
+  else
+    return
+  fi
+
+  wait_for_user
+}
+
+install_cocoapods() {
+  print_header "COCOAPODS"
+
+  if ! [ -x "$(command -v pod)" ]; then
+    local action="install"
+  else
+    local action="reinstall"
+
+    info "Current Pods installation:"
+    printf "%s$(pod --version)\n\n"
+  fi
+
+  if [ $NONINTERACTIVE == 0 ]; then
+    read -r -p "Do you want to $action CocoaPods? ${tty_bold}[y/N]${tty_reset} " response
+  fi
+
+  if [[ $NONINTERACTIVE == 1 ]] || [[ "$response" =~ ^[yY]$ ]]; then
+    brew reinstall cocoapods
+    brew link cocoapods
   else
     return
   fi
@@ -577,8 +616,9 @@ install_environment() {
     install_java "$JAVA_VERSION"
     install_android_cmd_tools "$ANDROID_SDK_BUILD_TOOLS_VERSION" "$ANDROID_SDK_PLATFORMS_VERSION" "$REQUIRE_ASTUDIO_VERSION"
     install_ruby "$RUBY_VERSION"
+    install_cocoapods
     install_bundler "$BUNDLER_VERSION"
-    install_yarn
+    install_yarn "$NODE_VERSION"
   else
     error "Git is required in order to proceed. Please install it manually."
   fi
