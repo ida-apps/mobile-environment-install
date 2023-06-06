@@ -14,15 +14,17 @@ export HOMEBREW_NO_ENV_HINTS
 home_dir=~
 eval home_dir=$home_dir
 
-JAVA_VERSION="latest"                    # Possible values: 8, 11, 17, latest
-RUBY_VERSION="latest"                    # Possible values: release number, latest
-NODE_VERSION="latest"                    # Possible values: 10, 12, 14, 16, 18, latest
-BUNDLER_VERSION="latest"                 # Possible values: release number, latest
-ANDROID_SDK_PLATFORMS_VERSION="33"       # Possible values: https://developer.android.com/studio/releases/platforms
-ANDROID_SDK_BUILD_TOOLS_VERSION="33.0.1" # Possible values: https://developer.android.com/studio/releases/build-tools
+COCOAPODS_VERSION="none"               # Possible values: any, none
+YARN_VERSION="none"                    # Possible values: any, none
+JAVA_VERSION="none"                    # Possible values: 8, 11, 17, latest, none
+RUBY_VERSION="none"                    # Possible values: release number, latest, none
+NODE_VERSION="none"                    # Possible values: 10, 12, 14, 16, 18, latest, none
+BUNDLER_VERSION="none"                 # Possible values: release number, latest, none
+ANDROID_SDK_PLATFORMS_VERSION="none"   # Possible values: https://developer.android.com/studio/releases/platforms
+ANDROID_SDK_BUILD_TOOLS_VERSION="none" # Possible values: https://developer.android.com/studio/releases/build-tools
 
-REQUIRE_XCODE_VERSION="any"   # Will abort execution if required XCode version was not installed manually. Value "any" skips the check.
-REQUIRE_ASTUDIO_VERSION="any" # Will show warning if required Android Studio build is not detected in the Applications folder. Value "any" skips the check.
+REQUIRE_XCODE_VERSION="none"   # Will abort execution if required XCode version was not installed manually. Value "any" skips the check.
+REQUIRE_ASTUDIO_VERSION="none" # Will show warning if required Android Studio build is not detected in the Applications folder. Value "any" skips the check.
 
 CLEAN_INSTALL=0 # Removes the environment prior to the installation.
 
@@ -41,6 +43,14 @@ while [ "$#" -gt 0 ]; do
     ;;
   --clean)
     CLEAN_INSTALL=$2
+    shift 2
+    ;;
+  --version-cocoapods)
+    COCOAPODS_VERSION="$2"
+    shift 2
+    ;;
+  --version-yarn)
+    YARN_VERSION="$2"
     shift 2
     ;;
   --version-java)
@@ -221,6 +231,10 @@ install_android_cmd_tools() {
   local platforms_version=$2
   local required_as_build_number=$3
 
+  if [ $build_tools_version == "none" ] || [ $platforms_version == "none" ]; then
+    return
+  fi
+
   print_header "ANDROID SDK"
 
   if ! [ -x "$(command -v sdkmanager)" ]; then
@@ -313,6 +327,10 @@ install_android_cmd_tools() {
 install_ruby() {
   local version=$1
 
+  if [ $version == "none" ]; then
+    return
+  fi
+
   print_header "RUBY"
 
   if [ -x "$(command -v ruby)" ]; then
@@ -367,6 +385,10 @@ install_ruby() {
 install_bundler() {
   local version=$1
 
+  if [ $version == "none" ]; then
+    return
+  fi
+
   print_header "BUNDLER"
 
   if ! [ -x "$(command -v bundler)" ]; then
@@ -410,6 +432,10 @@ install_bundler() {
 
 install_java() {
   local version=$1
+
+  if [ $version == "none" ]; then
+    return
+  fi
 
   print_header "JDK"
 
@@ -471,6 +497,10 @@ install_java() {
 }
 
 install_yarn() {
+  if [ $YARN_VERSION == "none" ]; then
+    return
+  fi
+
   local node_version=$1
   print_header "YARN"
 
@@ -503,6 +533,10 @@ install_yarn() {
 }
 
 install_cocoapods() {
+  if [ $COCOAPODS_VERSION == "none" ]; then
+    return
+  fi
+
   print_header "COCOAPODS"
 
   if ! [ -x "$(command -v pod)" ]; then
@@ -530,6 +564,11 @@ install_cocoapods() {
 
 check_and_install_xcode() {
   local require_version=$1
+
+  if [ $require_version == "none" ]; then
+    return
+  fi
+
   print_header "XCODE"
 
   if ! [ -x "$(command -v xcodebuild)" ]; then
