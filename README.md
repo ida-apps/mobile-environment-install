@@ -21,6 +21,7 @@ It's a fairly simple and straightforward script purposed for configuring(install
 
 ## How to use it?
 
+The script works
 Simply call:
 ```
 /bin/bash install-enviroment.sh
@@ -79,6 +80,11 @@ All arguments are optional to use. If you don't include one the corresponding de
 **Description**: Sets the desired target build version of Android Studio. **This requirement is not strict and will not fail the execution but just display an error message.**
 
 ***
+
+curl -s https://raw.githubusercontent.com/ida-apps/mobile-environment-install/main/install-enviroment.sh > temp.sh \
+&& chmod +x script.sh \
+&& ./temp.sh --interactive 1 \
+&& rm temp.sh
 
 # TODO
 
